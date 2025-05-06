@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>إدارة التصنيفات</title>
+  <link rel="stylesheet" href="static/css/store.css" />
+  <style>
+    body {
+      background-color: #f5f6fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .tabs-container {
+      max-width: 500px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 25px;
+    }
+
+    form input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+
+    .save-btn {
+      width: 100%;
+      background-color: #25a18e;
+      color: white;
+      padding: 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .save-btn:hover {
+      background-color: #1e8c7a;
+    }
+
+    /* زر الرجوع وتسجيل الخروج */
+    .fixed-btn {
+      position: fixed;
+      top: 15px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      z-index: 999;
+      color: white;
+    }
+
+    .back-btn {
+      right: 15px;
+      background-color: #25a18e;
+    }
+
+    .logout-btn {
+      left: 15px;
+      background-color: #888;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- زر الرجوع -->
+  <button onclick="goBackToStore()" class="fixed-btn back-btn">🏬 العودة للمتجر</button>
+
+  <!-- زر تسجيل الخروج -->
+  <button onclick="logout()" class="fixed-btn logout-btn">⎋ تسجيل خروج</button>
+
+  <div class="tabs-container">
+    <h2>⚙️ إدارة التصنيفات والمعلومات</h2>
+    <form id="tabsForm">
+          <input type="text" id="phone" placeholder="📞 رقم الهاتف">
+      <input type="text" id="instagram" placeholder="📸 رابط انستغرام">
+      <input type="text" id="whatsapp" placeholder="💬 رقم واتساب">
+      <button type="submit" class="save-btn">💾 حفظ</button>
+    </form>
+  </div>
+
+  <script src="static/js/manage_tabs.js"></script>
+  <script>
+    function goBackToStore() {
+      window.location.href = 'store.html';
+    }
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    }
+  </script>
+
+</body>
+</html>

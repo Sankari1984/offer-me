@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>متجر العروض</title>
+  <link rel="stylesheet" href="static/css/store.css" />
+  <link rel="manifest" href="static/manifest.json">
+</head>
+<body>
+<header class="header-store">
+  <div class="top-bar">
+    <button onclick="logout()" class="logout-btn">⬋ تسجيل خروج</button>
+  </div>
+  <div class="store-info">
+    <img id="storeLogo" src="" alt="شعار المتجر" class="store-logo" onerror="this.style.display='none'">
+    <h1 id="storeOwnerDisplay">...</h1>
+  </div>
+  <div class="store-actions">
+    <button onclick="window.location.href='upload_logo.html'" class="btn-green">🖼️ تعديل الشعار</button>
+    <button onclick="window.location.href='change_password.html'" class="btn-key">🔑 تغيير كلمة السر</button>
+    <button onclick="requestNotificationPermission()" class="btn-key">🔔 تفعيل الإشعارات</button>
+
+  </div>
+</header>
+<div id="notificationBar" style="display:none; background:#fff3cd; color:#856404; padding:10px; text-align:center; font-weight:bold; border-bottom:1px solid #ffeeba">
+  📣 إشعار: تمت إضافة منتج جديد!
+</div>
+<div class="category-tabs" id="tabsContainer"></div>
+<main class="products-grid" id="productsContainer"></main>
+<footer class="bottom-nav">
+  <button onclick="goToUpload()">➕ رفع منتج</button>
+  <button onclick="goToManageTabs()">⚙️ إدارة </button>
+</footer>
+<div id="mediaModal" onclick="if(event.target.id==='mediaModal') closeMediaModal()" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:9999;">
+  <div id="mediaContent" style="width: 100%; text-align: center;"></div>
+</div>
+<script>
+const BASE_URL = "http://192.168.18.11:5000";
+const urlParams = new URLSearchParams(window.location.search);
+let userId = urlParams.get('user_id') || localStorage.getItem('user_id');
+const highlightId = urlParams.get('highlight');
+
+if (!userId) {
+  window.location.href = 'login.html';
+}
+localStorage.setItem('user_id', userId);
+const fullName = localStorage.getItem('full_name');
+const storeTitle = document.getElementById('storeOwnerDisplay');
+if (highlightId) {
+  fetch(`${BASE_URL}/settings/${userId}`)
+    .then(res => res.json())
+    .then(data => {
+      storeTitle.innerHTML = `🍭 متجر ${data.full_name || data.name || userId}`;
+    });
+} else {
+  storeTitle.innerHTML = `🍭 متجر ${fullName || userId}`;
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = 'login.html';
+}
+function goToUpload() { window.location.href = 'upload.html'; }
+function goToManageTabs() { window.location.href = 'manage_tabs.html'; }
+function expandPost(id, link) {
+  const postDiv = document.getElementById('post-' + id);
+  postDiv.classList.toggle('expanded');
+  link.textContent = postDiv.classList.contains('expanded') ? "عرض أقل" : "عرض المزيد";
+}
+function openMediaModal(mediaUrl, isVideo) {
+  const modal = document.getElementById('mediaModal');
+  const content = document.getElementById('mediaContent');
+  content.innerHTML = isVideo ?
+    `<video src="${mediaUrl}" autoplay controls playsinline style="max-width: 80vw; max-height: 60vh; border-radius: 10px;"></video>` :
+    `<img src="${mediaUrl}" style="max-width: 80vw; max-height: 60vh; border-radius: 10px;">`;
+  modal.style.display = 'flex';
+}
+function closeMediaModal() {
+  document.getElementById('mediaModal').style.display = 'none';
+  document.getElementById('mediaContent').innerHTML = '';
+}
+
+async function loadProducts() {
+  const container = document.getElementById('productsContainer');
+  container.innerHTML = '';
+  try {
+    const response = await fetch(`${BASE_URL}/products`);
+    const products = await response.json();
+
+    let filtered = products.filter(p => p.user_id === userId);
+
+    // المنتجات المثبتة أولاً
+    filtered.sort((a, b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return 0;
+    });
+
+    if (highlightId) {
+      const target = filtered.find(p => p.id === highlightId);
+      if (target) {
+        filtered = [target, ...filtered.filter(p => p.id !== highlightId)];
+      }
+    }
+
+    if (!filtered.length) {
+      container.innerHTML = '<p style="text-align:center; color:#777; margin-top:30px">لا يوجد منتجات مضافة حالياً.</p>';
+      return;
+    }
+
+    filtered.forEach(product => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      const post = product.post?.trim() || "";
+      const safePost = post.replace(/`/g, "\\`").replace(/'/g, "\\'").replace(/\n/g, "<br>").replace(/"/g, '&quot;');
+      const postHTML = post ? `<div class="product-ai-post" id="post-${product.id}">${post}</div><span class="see-more" onclick="expandPost('${product.id}', this)">عرض المزيد</span>` : "";
+      const isVideo = /\.(mp4|mov|webm)$/i.test(product.image);
+
+      const media = isVideo ? `
+        <div style="position:relative;">
+          <video src="${product.image}#t=1" preload="metadata" muted playsinline
+            style="width: 100%; max-height: 350px; object-fit: cover; border-radius: 8px; cursor: pointer;"
+            onclick="event.stopPropagation(); openMediaModal('${product.image}', true)"></video>
+          <div style="position:absolute; top:8px; right:8px; background:#000a; color:#fff; padding:4px 6px; border-radius:4px; font-size:12px;">🎥 فيديو</div>
+        </div>
+      ` : `<img src="${product.image}" alt="${product.name}" style="border-radius:8px; cursor:pointer;" onclick="openMediaModal('${product.image}', false)">`;
+
+      card.innerHTML = `
+        <div style="background:#ffffff; padding:0 16px 12px">${postHTML}</div>
+        ${media}
+        <div class="product-card-content">
+          <h3>${product.name} ${product.price ? `- ${product.price} ر.ق` : ''}</h3>
+          <p class="product-description">${product.description}</p>
+          <div class="share-buttons">
+            <button class="copy-btn" data-post="${safePost}">📋 نسخ</button>
+            <button onclick="event.stopPropagation(); sharePost(\`${safePost}\`)">🔗 مشاركة</button>
+            ${!highlightId ? `
+              <button onclick="event.stopPropagation(); deleteProduct('${product.id}')">🗑️ حذف</button>
+              <button onclick="event.stopPropagation(); pinProduct('${product.id}')">📌 تثبيت</button>
+            ` : ''}
+            ${highlightId ? `
+              <span style="font-size: 14px; cursor:pointer;" onclick="likeProduct('${product.id}')">
+                ❤️ <span id="likes-${product.id}">0</span> إعجاب
+              </span>
+            ` : `
+              <span style="font-size: 14px;">
+                ❤️ <span id="likes-${product.id}">0</span> إعجاب
+              </span>
+            `}
+          </div>
+        </div>`;
+      container.appendChild(card);
+      loadLikes(product.id);
+    });
+  } catch (err) {
+    container.innerHTML = '<p style="color:red; text-align:center;">❌ فشل في تحميل المنتجات.</p>';
+    console.error("🚫 خطأ في التحميل:", err);
+  }
+}
+
+document.addEventListener("click", function(e) {
+  if (e.target.classList.contains("copy-btn")) {
+    const text = e.target.getAttribute("data-post") || "";
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand("copy");
+      alert("✅ تم النسخ");
+    } catch (err) {
+      alert("❌ فشل النسخ");
+    }
+    document.body.removeChild(textarea);
+  }
+});
+
+function sharePost(text) {
+  const url = encodeURIComponent(window.location.href);
+  const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(text)}`;
+  window.open(shareUrl, '_blank');
+}
+
+async function deleteProduct(id) {
+  if (!confirm("هل أنت متأكد من حذف المنتج؟")) return;
+  const res = await fetch(`${BASE_URL}/delete-product/${id}`, { method: 'DELETE' });
+  const result = await res.json();
+  if (result.status === 'success') loadProducts();
+}
+
+async function pinProduct(id) {
+  if (!confirm("هل تريد تثبيت هذا المنتج في الأعلى؟")) return;
+  const res = await fetch(`${BASE_URL}/pin-product/${id}`, { method: 'POST' });
+  const result = await res.json();
+  if (result.status === 'success') loadProducts();
+}
+
+function likeProduct(productId) {
+  fetch(`${BASE_URL}/like/${productId}`, { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById(`likes-${productId}`).textContent = data.likes;
+    });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (!userId) return window.location.href = 'login.html';
+
+  if (highlightId) {
+    const actions = document.querySelector('.store-actions');
+    const footer = document.querySelector('.bottom-nav');
+    const logoutBtn = document.querySelector('.logout-btn');
+    if (actions) actions.style.display = 'none';
+    if (footer) footer.style.display = 'none';
+    if (logoutBtn) logoutBtn.style.display = 'none';
+  }
+
+  fetch(`${BASE_URL}/settings/${userId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.logo) {
+        document.getElementById('storeLogo').src = `${BASE_URL}${data.logo}?t=${Date.now()}`;
+      }
+    });
+
+  loadProducts();
+});
+requestNotificationPermission();
+
+function loadLikes(productId) {
+  fetch(`${BASE_URL}/likes/${productId}`)
+    .then(res => res.json())
+    .then(data => {
+      const likesSpan = document.getElementById(`likes-${productId}`);
+      if (likesSpan) {
+        likesSpan.textContent = data.likes || 0;
+      }
+    });
+}
+function requestNotificationPermission() {
+  Notification.requestPermission().then(permission => {
+    if (permission === 'granted') {
+      importFirebaseMessaging(userId); // لازم تكون الدالة موجودة في store.js
+    } else {
+      alert("❌ لم يتم السماح بالإشعارات");
+    }
+  });
+}
+
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then(reg => {
+        console.log('✅ تم تسجيل Service Worker:', reg);
+      }).catch(err => {
+        console.error('❌ فشل تسجيل Service Worker:', err);
+      });
+  }
+</script>
+<script>
+  // ✅ تسجيل Service Worker للإشعارات
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then(reg => console.log('✅ Service Worker تم تسجيله بنجاح:', reg.scope))
+      .catch(err => console.error('❌ فشل في تسجيل Service Worker:', err));
+  }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('firebase-messaging-sw.js')
+      .then(function(registration) {
+        console.log('📦 Service Worker مسجل بنجاح:', registration);
+      }).catch(function(err) {
+        console.error('❌ فشل في تسجيل Service Worker:', err);
+      });
+  }
+</script>
+<script type="module" src="/static/js/store.js"></script>
+
+
+</body>
+</html>

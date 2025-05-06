@@ -1,0 +1,257 @@
+/* ====== الهيدر والتسجيل ====== */
+.header-store {
+  background-color: #ff4747;
+  color: white;
+  padding: 16px 20px;
+  text-align: center;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 5px;
+}
+
+.logout-btn {
+  background-color: #777;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.store-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.store-info h1 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.store-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 50%;
+  background-color: white;
+  padding: 3px;
+}
+
+.store-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-green {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-key {
+  background-color: #f39c12;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ====== التبويبات ====== */
+.category-tabs {
+  display: flex;
+  overflow-x: auto;
+  background: white;
+  padding: 10px;
+  gap: 10px;
+}
+
+.category-tabs button {
+  flex: 0 0 auto;
+  background: #ff4747;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.category-tabs button:hover {
+  background-color: #d32f2f;
+}
+
+/* ====== شبكة المنتجات (ستايل فيسبوك) ====== */
+.products-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.product-card {
+  background: #ffffff !important;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+}
+
+.product-card img,
+.product-card video {
+  width: 100%;
+  max-height: 350px;
+  object-fit: cover;
+  background-color: #f1f1f1;
+}
+
+.product-card-content {
+  padding: 12px 16px;
+}
+
+.product-card-content h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #222;
+  text-align: right;
+}
+
+.product-description {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+/* ====== بوست فوق الصورة بخلفية بيضاء بدون خط ====== */
+.product-ai-post {
+  background: #ffffff !important;
+  padding: 10px;
+  border-radius: 8px 8px 0 0;
+  font-style: italic;
+  font-size: 15px;
+  color: #444;
+  line-height: 1.6;
+  text-align: right;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  max-height: 3.2em;
+  position: relative;
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 0 !important;
+}
+
+/* ====== عرض المزيد بشكل واضح ====== */
+.product-ai-post.expanded {
+  max-height: none;
+  display: block; /* الغي تأثير -webkit-box */
+}
+
+.see-more {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 6px 12px;
+  background-color: #ffffff !important; /* ✅ خلفية بيضاء */
+  color: #007bff;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  direction: rtl;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+.see-more:hover {
+  background-color: #e0e0e0;
+}
+
+/* ====== أزرار المشاركة بشكل مرتب ====== */
+.share-buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 16px;
+}
+
+.share-buttons button {
+  background: #f0f0f0;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  flex: 1;
+  color: #333;
+  transition: background 0.3s;
+  min-width: 70px;
+}
+
+.share-buttons button:hover {
+  background: #e0e0e0;
+}
+
+/* ====== القائمة السفلية ====== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: calc(env(safe-area-inset-bottom, 10px) + 10px) 0;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 999;
+}
+
+.bottom-nav button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #ff4747;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.bottom-nav button:hover {
+  color: #d63031;
+}
+
+/* ====== هامش للجسم لتفادي تغطية البوتوم ====== */
+body {
+  padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 80px);
+  background: #f9f9f9;
+}

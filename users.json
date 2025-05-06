@@ -1,0 +1,23 @@
+[
+    {
+        "user_id": "admin",
+        "username": "admin",
+        "password": "admin123",
+        "full_name": "مدير النظام",
+        "business_type": "إدارة النظام"
+    },
+    {
+        "user_id": "haytham",
+        "username": "haytham",
+        "password": "1",
+        "full_name": "شركة سنادار للتجارة والمقاولات",
+        "business_type": "مقاولات"
+    },
+    {
+        "user_id": "مالك",
+        "username": "مالك",
+        "password": "1",
+        "full_name": "شركة واوزر للتجارة والمقاولات",
+        "business_type": "إلكترونيات"
+    }
+]

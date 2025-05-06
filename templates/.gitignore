@@ -1,0 +1,2 @@
+echo service_account_key.json >> .gitignore
+echo offer-me-c0c4b-firebase-adminsdk-fbsvc-38ec5ff46d.json >> .gitignore
