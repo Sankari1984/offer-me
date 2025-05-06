@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // ✅ تحميل المعلومات فقط (بدون tabs)
-  fetch(`your-app-name.onrender.com/settings/${userId}`)
+  fetch(`https://your-app-name.onrender.com/settings/${userId}`)
     .then(response => response.json())
     .then(data => {
       document.getElementById('phone').value = data.phone || '';
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const instagram = document.getElementById('instagram').value.trim();
     const whatsapp = document.getElementById('whatsapp').value.trim();
 
-    fetch(`your-app-name.onrender.com/settings/${userId}`, {
+    fetch(`https://offer-me.onrender.com/settings/${userId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tabs: [], phone, instagram, whatsapp })  // tabs فارغة

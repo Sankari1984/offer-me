@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   const productsContainer = document.getElementById('productsContainer');
 
-  fetch(`http://192.168.18.11:5000/products`)
+  fetch(`https://offer-me.onrender.com/products`)
     .then(response => response.json())
     .then(products => {
       let userProducts = products.filter(p => p.user_id === userId);
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async function () {
           const productCard = document.createElement('div');
           productCard.classList.add('product-card');
 
-          const fullUrl = `http://192.168.18.11:5000${product.image}`;
+          const fullUrl = `https://offer-me.onrender.com${product.image}`;
           let mediaElement = '';
           if (fullUrl.endsWith('.mp4') || fullUrl.endsWith('.webm') || fullUrl.endsWith('.mov')) {
             mediaElement = `
@@ -126,7 +126,7 @@ function openPopup(imageSrc) {
 
 function deleteProduct(productId) {
   if (!confirm("❗ هل أنت متأكد أنك تريد حذف هذا المنتج؟")) return;
-  fetch(`http://192.168.18.11:5000/delete-product/${productId}`, {
+  fetch(`https://offer-me.onrender.com/delete-product/${productId}`, {
     method: 'DELETE'
   })
     .then(res => res.json())
@@ -165,7 +165,7 @@ async function importFirebaseMessaging(userId) {
       }).then(currentToken => {
         if (currentToken) {
           console.log('🔑 Token:', currentToken);
-          fetch('http://192.168.18.11:5000/save-token', {
+          fetch('https://offer-me.onrender.com/save-token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
