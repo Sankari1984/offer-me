@@ -558,6 +558,8 @@ from flask import send_from_directory
 def serve_firebase_sw():
     return send_from_directory('.', 'firebase-messaging-sw.js')
 
+@app.route('/')
+def home(): return render_template('store.html')
 
 if __name__ == '__main__':
    import os
