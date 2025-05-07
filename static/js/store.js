@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       if (userProducts.length === 0) {
         productsContainer.innerHTML = "<p style='text-align:center;'>لا يوجد منتجات مضافة حالياً.</p>";
       } else {
+        productsContainer.innerHTML = '';
         userProducts.forEach(product => {
           const productCard = document.createElement('div');
           productCard.classList.add('product-card');
