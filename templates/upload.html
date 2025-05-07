@@ -70,12 +70,39 @@
       max-height: 300px;
       border-radius: 8px;
     }
+
+    /* loader */
+    #loader {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.8);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    #loader div {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #ff4747;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 
 <header>📤 رفع منتج جديد</header>
 <button class="back-button" onclick="goBackToStore()">🏪 العودة للمتجر</button>
+
+<!-- Loader -->
+<div id="loader"><div></div></div>
 
 <div class="container">
   <form id="uploadForm" enctype="multipart/form-data">
@@ -101,6 +128,13 @@
 
   const userId = localStorage.getItem("user_id");
 
+  function showLoader() {
+    document.getElementById('loader').style.display = 'flex';
+  }
+  function hideLoader() {
+    document.getElementById('loader').style.display = 'none';
+  }
+
   // توليد البوست تلقائياً
   document.getElementById("generatePostBtn").addEventListener("click", async function () {
     const name = document.getElementById("name").value.trim();
@@ -113,12 +147,14 @@
     }
 
     try {
-      const res = await fetch("http://192.168.18.11:5000/generate-post", {
+      showLoader();
+      const res = await fetch("https://offer-me.onrender.com/generate-post", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, description: desc, user_id: userId })
       });
       const data = await res.json();
+      hideLoader();
       if (data.status === "success") {
         postArea.value = data.post;
         alert("✅ تم توليد البوست بنجاح! يمكنك تعديله الآن.");
@@ -126,6 +162,7 @@
         alert("❌ فشل في توليد البوست: " + data.message);
       }
     } catch (err) {
+      hideLoader();
       alert("❌ خطأ في الاتصال بالخادم.");
       console.error(err);
     }
@@ -143,11 +180,13 @@
     formData.append('file', document.getElementById('file').files[0]);
 
     try {
-      const response = await fetch('http://192.168.18.11:5000/confirm-product', {
+      showLoader();
+      const response = await fetch('https://offer-me.onrender.com/confirm-product', {
         method: 'POST',
         body: formData
       });
       const result = await response.json();
+      hideLoader();
       if (result.status === 'success') {
         alert("✅ تم حفظ المنتج بنجاح!");
         window.location.href = 'store.html';
@@ -155,6 +194,7 @@
         alert('❌ فشل الحفظ: ' + result.message);
       }
     } catch (err) {
+      hideLoader();
       console.error('❌ خطأ أثناء حفظ المنتج:', err);
     }
   });
@@ -184,5 +224,6 @@
     }
   });
 </script>
+
 </body>
 </html>

@@ -1,6 +1,8 @@
+const BASE_URL = "https://offer-me.onrender.com"; // غيّر الرابط إذا احتجت
+
 document.addEventListener("DOMContentLoaded", () => {
   loadUsers();
-  loadBusinessTypes(); // 🔄 تحميل أنواع النشاط من ملف خارجي
+  loadBusinessTypes();
 
   document.getElementById("userForm").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -22,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch("/add-user", {
+      const response = await fetch(`${BASE_URL}/add-user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -31,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
           password,
           business_type
         })
-      }); // ✅ ← أُغلِق القوس الناقص هون
+      });
 
       const result = await response.json();
       if (result.status === "success") {
@@ -50,13 +52,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadUsers() {
   try {
-    const res = await fetch("/users");
+    const res = await fetch(`${BASE_URL}/users`);
     const users = await res.json();
     const container = document.getElementById("usersList");
     container.innerHTML = "";
 
     users.forEach((user) => {
-      if (user.username === "admin") return; // ✅ تجاهل عرض الأدمن
+      if (user.username === "admin") return;
       const row = document.createElement("div");
       row.className = "user-row";
       row.innerHTML = `
@@ -74,7 +76,7 @@ async function deleteUser(user_id) {
   if (!confirm("هل أنت متأكد أنك تريد حذف هذا المستخدم؟")) return;
 
   try {
-    const res = await fetch(`/delete-user/${user_id}`, { method: "DELETE" });
+    const res = await fetch(`${BASE_URL}/delete-user/${user_id}`, { method: "DELETE" });
     const result = await res.json();
     if (result.status === "success") {
       alert("✅ تم حذف المستخدم");
@@ -90,7 +92,7 @@ async function deleteUser(user_id) {
 
 async function loadBusinessTypes() {
   try {
-    const res = await fetch("/business-types");
+    const res = await fetch(`${BASE_URL}/business-types`);
     const types = await res.json();
     const select = document.getElementById("businessType");
 

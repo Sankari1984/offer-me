@@ -1,4 +1,4 @@
-// ✅ store.js كامل ومصحح لتفعيل إشعارات Firebase بدون تكرار
+const BASE_URL = "https://offer-me.onrender.com";
 
 document.addEventListener('DOMContentLoaded', async function () {
   const urlParams = new URLSearchParams(window.location.search);
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   const productsContainer = document.getElementById('productsContainer');
 
-  fetch(`https://offer-me.onrender.com/products`)
+  fetch(`${BASE_URL}/products`)
     .then(response => response.json())
     .then(products => {
       let userProducts = products.filter(p => p.user_id === userId);
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async function () {
           const productCard = document.createElement('div');
           productCard.classList.add('product-card');
 
-          const fullUrl = `https://offer-me.onrender.com${product.image}`;
+          const fullUrl = `${BASE_URL}${product.image}`;
           let mediaElement = '';
           if (fullUrl.endsWith('.mp4') || fullUrl.endsWith('.webm') || fullUrl.endsWith('.mov')) {
             mediaElement = `
@@ -74,7 +74,6 @@ document.addEventListener('DOMContentLoaded', async function () {
       productsContainer.innerHTML = "<p>❌ حدث خطأ أثناء تحميل المنتجات.</p>";
     });
 
-  // ✅ تفعيل Firebase Notifications
   importFirebaseMessaging(userId);
 });
 
@@ -126,7 +125,7 @@ function openPopup(imageSrc) {
 
 function deleteProduct(productId) {
   if (!confirm("❗ هل أنت متأكد أنك تريد حذف هذا المنتج؟")) return;
-  fetch(`https://offer-me.onrender.com/delete-product/${productId}`, {
+  fetch(`${BASE_URL}/delete-product/${productId}`, {
     method: 'DELETE'
   })
     .then(res => res.json())
@@ -140,7 +139,6 @@ function deleteProduct(productId) {
     });
 }
 
-// ✅ استيراد Firebase SDK وتفعيل Push Notifications
 async function importFirebaseMessaging(userId) {
   const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
   const { getMessaging, getToken, onMessage } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js");
@@ -165,7 +163,7 @@ async function importFirebaseMessaging(userId) {
       }).then(currentToken => {
         if (currentToken) {
           console.log('🔑 Token:', currentToken);
-          fetch('https://offer-me.onrender.com/save-token', {
+          fetch(`${BASE_URL}/save-token`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

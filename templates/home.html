@@ -1,4 +1,3 @@
-<!-- templates/home.html -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -32,12 +31,14 @@
 </main>
 
 <script>
+const BASE_URL = "https://offer-me.onrender.com"; // 🔗 عدل هذا إذا تغير رابط السيرفر
+
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('button').forEach(btn => {
     const match = btn.getAttribute('onclick')?.match(/likeProduct\('(.+?)'/);
     if (match) {
       const productId = match[1];
-      fetch(`/likes/${productId}`)
+      fetch(`${BASE_URL}/likes/${productId}`)
         .then(res => res.json())
         .then(data => {
           const span = document.getElementById(`likes-${productId}`);
@@ -48,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function likeProduct(id, btn) {
-  fetch(`/like/${id}`, { method: 'POST' })
+  fetch(`${BASE_URL}/like/${id}`, { method: 'POST' })
     .then(res => res.json())
     .then(data => {
       const span = document.getElementById(`likes-${id}`);

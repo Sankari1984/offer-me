@@ -39,6 +39,7 @@
 <img id="preview" src="" alt="شعار المتجر الحالي" style="display:none;">
 
 <script>
+const BASE_URL = "https://offer-me.onrender.com";
 const userId = localStorage.getItem('user_id');
 if (!userId) {
   alert('❗ الرجاء تسجيل الدخول.');
@@ -46,12 +47,12 @@ if (!userId) {
 }
 
 // ✅ عرض الشعار الحالي (إن وجد)
-fetch(`http://192.168.18.11:5000/settings/${userId}`)
+fetch(`${BASE_URL}/settings/${userId}`)
   .then(res => res.json())
   .then(data => {
     if (data.logo) {
       const img = document.getElementById('preview');
-      img.src = `http://192.168.18.11:5000${data.logo}`;
+      img.src = `${BASE_URL}${data.logo}`;
       img.style.display = 'block';
     }
   });
@@ -68,7 +69,7 @@ async function uploadLogo() {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(`http://192.168.18.11:5000/upload-logo/${userId}`, {
+  const response = await fetch(`${BASE_URL}/upload-logo/${userId}`, {
     method: 'POST',
     body: formData
   });
@@ -76,7 +77,7 @@ async function uploadLogo() {
   const result = await response.json();
   if (result.status === 'success') {
     alert('✅ تم رفع الشعار بنجاح!');
-    document.getElementById('preview').src = `http://192.168.18.11:5000${result.logo}`;
+    document.getElementById('preview').src = `${BASE_URL}${result.logo}`;
     document.getElementById('preview').style.display = 'block';
   } else {
     alert('❌ فشل رفع الشعار.');
@@ -84,8 +85,7 @@ async function uploadLogo() {
 }
 </script>
 
-</body>
-</html>
+<!-- زر العودة للمتجر -->
 <button onclick="goBackToStore()" style="
   margin-top: 20px;
   background-color: #25a18e;
@@ -104,3 +104,6 @@ async function uploadLogo() {
     window.location.href = 'store.html';
   }
 </script>
+
+</body>
+</html>

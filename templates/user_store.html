@@ -15,6 +15,26 @@
       margin-top: 10px;
       white-space: pre-wrap;
     }
+
+    /* Loader */
+    #loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    #loader span {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #ff4747;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -29,6 +49,9 @@
     <p id="sellerWhatsApp">💬 واتساب: </p>
   </div>
 
+  <!-- ✅ مؤشر التحميل -->
+  <div id="loader"><span></span></div>
+
   <!-- ✅ شبكة المنتجات -->
   <div id="userProducts" class="product-grid"></div>
 
@@ -38,29 +61,23 @@
       const params = new URLSearchParams(window.location.search);
       const userId = params.get('user_id');
       const productsContainer = document.getElementById("userProducts");
+      const loader = document.getElementById("loader");
 
       if (!userId) {
+        loader.style.display = "none";
         productsContainer.innerHTML = "<p>❌ لا يوجد مستخدم محدد</p>";
         return;
       }
 
-      let sellerInfo = {};
       try {
         const res = await fetch(`/settings/${userId}`);
         const data = await res.json();
-        sellerInfo = {
-          phone: data.phone || 'غير متوفر',
-          instagram: data.instagram || 'غير متوفر',
-          whatsapp: data.whatsapp || 'غير متوفر'
-        };
 
-        // ✅ عرض معلومات الزبون أعلى الصفحة
-        document.getElementById("sellerPhone").innerText = `📞 هاتف: ${sellerInfo.phone}`;
-        document.getElementById("sellerInstagram").innerHTML = sellerInfo.instagram.startsWith("http")
-          ? `📸 <a href="${sellerInfo.instagram}" target="_blank">انستغرام</a>`
-          : `📸 انستغرام: ${sellerInfo.instagram}`;
-        document.getElementById("sellerWhatsApp").innerText = `💬 واتساب: ${sellerInfo.whatsapp}`;
-
+        document.getElementById("sellerPhone").innerText = `📞 هاتف: ${data.phone || 'غير متوفر'}`;
+        document.getElementById("sellerInstagram").innerHTML = data.instagram
+          ? `📸 <a href="${data.instagram.startsWith('http') ? data.instagram : 'https://' + data.instagram}" target="_blank">انستغرام</a>`
+          : '📸 انستغرام: غير متوفر';
+        document.getElementById("sellerWhatsApp").innerText = `💬 واتساب: ${data.whatsapp || 'غير متوفر'}`;
       } catch (err) {
         console.warn("❌ لم يتم جلب بيانات المستخدم:", err);
       }
@@ -99,6 +116,8 @@
         console.error("❌ خطأ في تحميل المنتجات:", err);
         productsContainer.innerHTML = "<p>❌ فشل في تحميل المنتجات.</p>";
       }
+
+      loader.style.display = "none";
     });
   </script>
 

@@ -1,3 +1,5 @@
+const BASE_URL = "https://offer-me.onrender.com"; // غيّر الرابط إذا بدك تجرب محلياً
+
 document.addEventListener('DOMContentLoaded', function () {
   const userId = localStorage.getItem('user_id');
 
@@ -7,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // تحميل التصنيفات للمستخدم
-  fetch(`http://192.168.18.11:5000/settings/${userId}`)
+  fetch(`${BASE_URL}/settings/${userId}`)
     .then(response => response.json())
     .then(data => {
       const categorySelect = document.getElementById('category');
@@ -46,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
     formData.append('file', document.getElementById('file').files[0]);
 
     try {
-      const response = await fetch(`http://192.168.18.11:5000/upload-product`, {
+      const response = await fetch(`${BASE_URL}/upload-product`, {
         method: 'POST',
         body: formData
       });
@@ -70,10 +72,11 @@ document.addEventListener('DOMContentLoaded', function () {
           confirmData.append('post', document.getElementById('generatedPost').value);
           confirmData.append('file', document.getElementById('file').files[0]);
 
-          const confirmRes = await fetch(`http://192.168.18.11:5000/confirm-product`, {
+          const confirmRes = await fetch(`${BASE_URL}/confirm-product`, {
             method: 'POST',
             body: confirmData
           });
+
           const confirmResult = await confirmRes.json();
           if (confirmResult.status === 'success') {
             alert('✅ تم نشر المنتج بنجاح!');

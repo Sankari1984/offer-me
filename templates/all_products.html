@@ -158,14 +158,17 @@
   </div>
 
   <div class="product-grid" id="productGrid"></div>
-
+  <script>
+    const BASE_URL = "https://offer-me.onrender.com";
+  </script>
+  
   <script>
     function viewComments(id) {
       alert("عرض التعليقات للمنتج رقم " + id);
     }
 
     function sortByLikes() {
-      fetch('/products')
+      fetch(`${BASE_URL}/products`)
         .then(res => res.json())
         .then(async products => {
           for (let product of products) {
@@ -179,7 +182,7 @@
     }
 
     function sortByPrice() {
-      fetch('/products')
+      fetch(`${BASE_URL}/products`)
         .then(res => res.json())
         .then(async products => {
           for (let product of products) {
@@ -225,7 +228,7 @@
         const btn = document.querySelector(`.like-btn[data-id="${product.id}"]`);
         if (btn) {
           btn.addEventListener('click', () => {
-            fetch(`/like/${product.id}`, { method: 'POST' })
+            fetch(`${BASE_URL}/like/${product.id}`, { method: 'POST' })
               .then(res => res.json())
               .then(data => {
                 const span = document.getElementById(`likes-${product.id}`);
@@ -246,7 +249,7 @@
     
     function viewComments(productId) {
       currentProductId = productId;
-      fetch(`/comments/${productId}`)
+      fetch(`${BASE_URL}/comments/${productId}`)
         .then(res => res.json())
         .then(comments => {
           const commentsList = document.getElementById('commentsList');
@@ -274,7 +277,7 @@
     function submitComment() {
       const newComment = document.getElementById('newComment').value.trim();
       if (!newComment) return alert('يرجى كتابة تعليق أولاً');
-      fetch('/add_comment', {
+      fetch(`${BASE_URL}/add_comment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ product_id: currentProductId, comment: newComment })
