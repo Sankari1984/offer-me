@@ -11,7 +11,9 @@
 <header class="header-store">
   <div class="top-bar">
     <button onclick="logout()" class="logout-btn">⬋ تسجيل خروج</button>
+    <button onclick="window.location.href='all_products.html'" class="btn-key">🛍️ جميع المنتجات</button>
   </div>
+  
   <div class="store-info">
     <img id="storeLogo" src="" alt="شعار المتجر" class="store-logo" onerror="this.style.display='none'">
     <h1 id="storeOwnerDisplay">...</h1>
@@ -23,6 +25,11 @@
 
   </div>
 </header>
+<!-- ✅ يظهر فقط إذا كنت زائر وليس صاحب المتجر -->
+<div id="backToAllProducts" style="display:none; text-align:center; margin: 10px;">
+  <button onclick="window.location.href='all_products.html'" class="btn-key">🔙 العودة إلى جميع المنتجات</button>
+</div>
+
 <div id="notificationBar" style="display:none; background:#fff3cd; color:#856404; padding:10px; text-align:center; font-weight:bold; border-bottom:1px solid #ffeeba">
   📣 إشعار: تمت إضافة منتج جديد!
 </div>
@@ -113,7 +120,7 @@ async function loadProducts() {
       const card = document.createElement('div');
       card.className = 'product-card';
       const post = product.post?.trim() || "";
-      const safePost = post.replace(/`/g, "\\`").replace(/'/g, "\\'").replace(/\n/g, "<br>").replace(/"/g, '&quot;');
+      const safePost = post.replace(/`/g, "\\`").replace(/'/g, "\\'").replace(/"/g, '\\"'); // فقط escape بدون <br>
       const postHTML = post ? `<div class="product-ai-post" id="post-${product.id}">${post}</div><span class="see-more" onclick="expandPost('${product.id}', this)">عرض المزيد</span>` : "";
       const isVideo = /\.(mp4|mov|webm)$/i.test(product.image);
 
@@ -135,19 +142,15 @@ async function loadProducts() {
           <div class="share-buttons">
             <button class="copy-btn" data-post="${safePost}">📋 نسخ</button>
             <button onclick="event.stopPropagation(); sharePost(\`${safePost}\`)">🔗 مشاركة</button>
-            ${!highlightId ? `
-              <button onclick="event.stopPropagation(); deleteProduct('${product.id}')">🗑️ حذف</button>
-              <button onclick="event.stopPropagation(); pinProduct('${product.id}')">📌 تثبيت</button>
-            ` : ''}
-            ${highlightId ? `
-              <span style="font-size: 14px; cursor:pointer;" onclick="likeProduct('${product.id}')">
-                ❤️ <span id="likes-${product.id}">0</span> إعجاب
-              </span>
-            ` : `
-              <span style="font-size: 14px;">
-                ❤️ <span id="likes-${product.id}">0</span> إعجاب
-              </span>
-            `}
+           ${(!highlightId) ? `
+           <button onclick="event.stopPropagation(); deleteProduct('${product.id}')">🗑️ حذف</button>
+           <button onclick="event.stopPropagation(); pinProduct('${product.id}')">📌 تثبيت</button>
+        ` : ''}
+
+           <span style="font-size: 14px;" ${highlightId ? `onclick="likeProduct('${product.id}')" style="cursor:pointer;"` : ''}>
+             ❤️ <span id="likes-${product.id}">0</span> إعجاب
+           </span>
+
           </div>
         </div>`;
       container.appendChild(card);
@@ -160,15 +163,16 @@ async function loadProducts() {
 }
 
 document.addEventListener("click", function(e) {
-  if (e.target.classList.contains("copy-btn")) {
-    const text = e.target.getAttribute("data-post") || "";
+  const btn = e.target.closest(".copy-btn");
+  if (btn) {
+    const rawText = btn.getAttribute("data-post") || "";
     const textarea = document.createElement("textarea");
-    textarea.value = text;
+    textarea.value = rawText.replace(/<br\s*\/?>/gi, "\n").replace(/&quot;/g, '"');
     document.body.appendChild(textarea);
     textarea.select();
     try {
       document.execCommand("copy");
-      alert("✅ تم النسخ");
+      alert("✅ تم نسخ البوست بنجاح");
     } catch (err) {
       alert("❌ فشل النسخ");
     }
@@ -176,9 +180,12 @@ document.addEventListener("click", function(e) {
   }
 });
 
+
+
 function sharePost(text) {
+  const cleanText = text.replace(/<br\s*\/?>/gi, "\n").replace(/&quot;/g, '"');
   const url = encodeURIComponent(window.location.href);
-  const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(text)}`;
+  const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${encodeURIComponent(cleanText)}`;
   window.open(shareUrl, '_blank');
 }
 
@@ -216,6 +223,9 @@ window.addEventListener('DOMContentLoaded', () => {
     if (logoutBtn) logoutBtn.style.display = 'none';
   }
 
+  const backBtn = document.getElementById('backToAllProducts');
+  if (highlightId && backBtn) backBtn.style.display = 'block';
+
   fetch(`${BASE_URL}/settings/${userId}`)
     .then(res => res.json())
     .then(data => {
@@ -226,6 +236,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
   loadProducts();
 });
+
+
 requestNotificationPermission();
 
 function loadLikes(productId) {

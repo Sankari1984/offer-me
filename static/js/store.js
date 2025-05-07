@@ -61,11 +61,20 @@ document.addEventListener('DOMContentLoaded', async function () {
                 <button onclick="shareFacebook('${product.post || ''}')">🌐 فيسبوك</button>
                 <button onclick="shareInstagram('${product.post || ''}')">📸 انستغرام</button>
                 <button onclick="deleteProduct('${product.id}')">🗑️ حذف</button>
+                <button onclick="likeProduct('${product.id}')">👍 إعجاب</button>
+                <span id="like-count-${product.id}">0</span>
               </div>
             </div>
           `;
 
           productsContainer.appendChild(productCard);
+
+          // تحميل عدد اللايكات من السيرفر
+          fetch(`${BASE_URL}/likes/${product.id}`)
+            .then(res => res.json())
+            .then(data => {
+              document.getElementById(`like-count-${product.id}`).innerText = data.likes;
+            });
         });
       }
     })
@@ -98,6 +107,33 @@ function shareInstagram(text) {
   });
 }
 
+function deleteProduct(productId) {
+  if (!confirm("❗ هل أنت متأكد أنك تريد حذف هذا المنتج؟")) return;
+  fetch(`${BASE_URL}/delete-product/${productId}`, {
+    method: 'DELETE'
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message);
+      location.reload();
+    })
+    .catch(err => {
+      alert("❌ حدث خطأ في حذف المنتج");
+      console.error(err);
+    });
+}
+
+function likeProduct(productId) {
+  fetch(`${BASE_URL}/like/${productId}`, {
+    method: 'POST'
+  })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById(`like-count-${productId}`).innerText = data.likes;
+    })
+    .catch(error => console.error("خطأ في تسجيل الإعجاب:", error));
+}
+
 function goToUpload() {
   window.location.href = 'upload.html';
 }
@@ -121,22 +157,6 @@ function openPopup(imageSrc) {
   popup.innerHTML = `<img src="${imageSrc}" style="max-width: 90%; max-height: 90%; border-radius: 10px;">`;
   popup.onclick = () => popup.remove();
   document.body.appendChild(popup);
-}
-
-function deleteProduct(productId) {
-  if (!confirm("❗ هل أنت متأكد أنك تريد حذف هذا المنتج؟")) return;
-  fetch(`${BASE_URL}/delete-product/${productId}`, {
-    method: 'DELETE'
-  })
-    .then(res => res.json())
-    .then(data => {
-      alert(data.message);
-      location.reload();
-    })
-    .catch(err => {
-      alert("❌ حدث خطأ في حذف المنتج");
-      console.error(err);
-    });
 }
 
 async function importFirebaseMessaging(userId) {

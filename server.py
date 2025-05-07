@@ -16,9 +16,7 @@ print("🔑 مفتاح OpenRouter:", OPENROUTER_API_KEY)
 
 app = Flask(__name__, template_folder='templates')
 CORS(app)
-import os
-import json
-from flask import request, jsonify
+
 
 TOKENS_FILE = 'fcm_tokens.json'
 
@@ -45,7 +43,7 @@ def save_token():
         json.dump(tokens, f, ensure_ascii=False, indent=2)
 
     return jsonify({"status": "success", "message": "Token saved ✅"})
-import requests
+
 
 FCM_API_KEY = "AAAAkUu..."  # 🔐 استبدله بمفتاح السيرفر من Firebase console (Server Key)
 
@@ -313,19 +311,10 @@ def upload_product():
     name = request.form.get('name')
     description = request.form.get('description')
     price = request.form.get('price', '')
-    file = request.files.get('file')
-
-    if not all([user_id, name , description, file]):
-        return jsonify({"status": "fail", "message": "جميع الحقول مطلوبة"}), 400
-
-    if not allowed_file(file.filename):
-        return jsonify({"status": "fail", "message": "نوع الملف غير مدعوم"}), 400
-
-    ext = file.filename.rsplit('.', 1)[1].lower()
-    filename = f"{uuid.uuid4()}.{ext}"
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(filepath)
-    file_url = f"/{UPLOAD_FOLDER}/{filename}"
+    
+    # لا تستقبل الملف نهائيًا
+    if not all([user_id, name, description]):
+        return jsonify({"status": "fail", "message": "❌ جميع الحقول مطلوبة"}), 400
 
     # جلب اسم الزبون
     with open(USERS_FILE, 'r', encoding='utf-8') as f:
@@ -336,19 +325,10 @@ def upload_product():
     post_text = generate_instagram_post(user_name=user_name.replace(" ", ""), product_name=name, description=description)
     print("📢 تم توليد البوست:", post_text)
 
-    # رجّع الرد فقط دون حفظ المنتج، حتى المستخدم يوافق عليه
     return jsonify({
         "status": "pending",
-        "message": "✅ تم توليد البوست. هل ترغب بحفظ المنتج؟",
-        "image": file_url,
-        "post": post_text,
-        "temp_data": {
-            "user_id": user_id,
-            "name": name,
-            "description": description,
-            "price": price,
-            "image": file_url
-        }
+        "message": "✅ تم توليد البوست فقط. لم يتم حفظ المنتج بعد.",
+        "post": post_text
     })
 
 
@@ -552,7 +532,7 @@ def get_business_types():
     with open('business_types.json', 'r', encoding='utf-8') as f:
         types = json.load(f)
     return jsonify(types)
-from flask import send_from_directory
+
 
 @app.route('/firebase-messaging-sw.js')
 def serve_firebase_sw():
@@ -562,7 +542,6 @@ def serve_firebase_sw():
 def home(): return render_template('store.html')
 
 if __name__ == '__main__':
-   import os
-port = int(os.environ.get("PORT", 5000))
+   port = int(os.environ.get("PORT", 5000))
 app.run(host="0.0.0.0", port=port)
 

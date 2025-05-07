@@ -145,9 +145,7 @@
     <div class="search-bar">
       <input type="text" id="searchInput" placeholder="🔍 ابحث مثل: منتجات أقل من 100 ريال..." />
     </div>
-    <div class="header-actions">
-      <button onclick="window.location.href='/'">🏠 الرئيسية</button>
-    </div>
+    
   </header>
 
   <div class="filter-bar">
@@ -182,7 +180,7 @@
     }
 
     function sortByPrice() {
-      fetch(`${BASE_URL}/products`)
+      fetch(`${BASE_URL}/products`) 
         .then(res => res.json())
         .then(async products => {
           for (let product of products) {
